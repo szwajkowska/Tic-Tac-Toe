@@ -12,6 +12,8 @@ public class PlayerResponse {
     String playerTwo;
     Board gameOne = new Board();
 
+    boolean isFinished;
+
     public void players() {
         System.out.println("Podaj imie pierwszego gracza");
         playerOne = scanner.nextLine();
@@ -21,18 +23,31 @@ public class PlayerResponse {
     }
 
     public void game() {
-        for (int i = 0; i < 5; i++) {
-            startGame(playerOne + ": Proszę podać pole. Twój znak to kółko", 'O');
-            if (i == 4) {
+        int i = 0;
+
+        do {
+            String player;
+            char mark;
+            if (i % 2 != 0) {
+                player = playerTwo;
+                mark = 'X';
+            } else {
+                player = playerOne;
+                mark = 'O';
+            }
+            startGame(player + ": Proszę podać pole. Twój znak to " + mark + ".", mark, player);
+            if (i == 8 && !isFinished){
+                System.out.println("Remis");
                 break;
             }
-            startGame(playerTwo + ": Proszę podać pole. Twój znak to krzyżyk", 'X');
-        }
+            i++;
+
+        } while (i < 9 && !isFinished);
+
     }
 
-    public void startGame(String message, char mark) {
+    public void startGame(String message, char mark, String player) {
         boolean isCorrect;
-
         Pattern pattern = Pattern.compile("[a-cA-C][1-3]");
         System.out.println(message);
         do {
@@ -40,16 +55,32 @@ public class PlayerResponse {
             isCorrect = false;
 
             if (pattern.matcher(playerChoice).matches()) {
-                completeBoard(mark, playerChoice);
-                isCorrect = true;
+
+                isCorrect = completeBoard(mark, playerChoice);
+
+                if (gameOne.tab[0][0] == mark && gameOne.tab[0][1] == mark && gameOne.tab[0][2] == mark ||
+                    gameOne.tab[1][0] == mark && gameOne.tab[1][1] == mark && gameOne.tab[1][2] == mark ||
+                    gameOne.tab[2][0] == mark && gameOne.tab[2][1] == mark && gameOne.tab[2][2] == mark ||
+                    gameOne.tab[0][0] == mark && gameOne.tab[1][0] == mark && gameOne.tab[2][0] == mark ||
+                    gameOne.tab[0][1] == mark && gameOne.tab[1][1] == mark && gameOne.tab[1][2] == mark ||
+                    gameOne.tab[0][2] == mark && gameOne.tab[1][2] == mark && gameOne.tab[2][2] == mark ||
+                    gameOne.tab[0][0] == mark && gameOne.tab[1][1] == mark && gameOne.tab[2][2] == mark ||
+                    gameOne.tab[0][2] == mark && gameOne.tab[1][1] == mark && gameOne.tab[2][0] == mark 
+                
+                    ) {
+                    System.out.println("Koniec gry. Wygrał gracz " + player);
+                    isFinished = true;
+
+                }
+
             } else {
                 System.out.println("Nie ma takiego pola! Wybierz jeszcze raz");
 
             }
-        } while (isCorrect == false);
+        } while (!isCorrect);
     }
 
-    public void completeBoard(char mark, String playerChoice) {
+    public boolean completeBoard(char mark, String playerChoice) {
 
         if (playerChoice.equalsIgnoreCase("A1") && (gameOne.tab[0][0] == '\u0000')) {
             gameOne.tab[0][0] = mark;
@@ -69,8 +100,12 @@ public class PlayerResponse {
             gameOne.tab[2][1] = mark;
         } else if (playerChoice.equalsIgnoreCase("C3") && (gameOne.tab[2][2] == '\u0000')) {
             gameOne.tab[2][2] = mark;
+        } else {
+            System.out.println("To pole jest już zajęte! Spróbuj jeszcze raz.");
+            return false;
         }
 
         gameOne.board();
+        return true;
     }
 }
