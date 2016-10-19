@@ -1,7 +1,5 @@
 package pl.ania;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -11,6 +9,7 @@ public class PlayerResponse {
     String playerOne;
     String playerTwo;
     Board gameOne = new Board();
+    Map map = new Map();
 
     boolean isFinished;
 
@@ -36,7 +35,7 @@ public class PlayerResponse {
                 mark = 'O';
             }
             startGame(player + ": Proszę podać pole. Twój znak to " + mark + ".", mark, player);
-            if (i == 8 && !isFinished){
+            if (i == 8 && !isFinished) {
                 System.out.println("Remis");
                 break;
             }
@@ -65,8 +64,8 @@ public class PlayerResponse {
                     gameOne.tab[0][1] == mark && gameOne.tab[1][1] == mark && gameOne.tab[1][2] == mark ||
                     gameOne.tab[0][2] == mark && gameOne.tab[1][2] == mark && gameOne.tab[2][2] == mark ||
                     gameOne.tab[0][0] == mark && gameOne.tab[1][1] == mark && gameOne.tab[2][2] == mark ||
-                    gameOne.tab[0][2] == mark && gameOne.tab[1][1] == mark && gameOne.tab[2][0] == mark 
-                
+                    gameOne.tab[0][2] == mark && gameOne.tab[1][1] == mark && gameOne.tab[2][0] == mark
+
                     ) {
                     System.out.println("Koniec gry. Wygrał gracz " + player);
                     isFinished = true;
@@ -82,30 +81,23 @@ public class PlayerResponse {
 
     public boolean completeBoard(char mark, String playerChoice) {
 
-        if (playerChoice.equalsIgnoreCase("A1") && (gameOne.tab[0][0] == '\u0000')) {
-            gameOne.tab[0][0] = mark;
-        } else if (playerChoice.equalsIgnoreCase("B1") && (gameOne.tab[0][1] == '\u0000')) {
-            gameOne.tab[0][1] = mark;
-        } else if (playerChoice.equalsIgnoreCase("C1") && (gameOne.tab[0][2] == '\u0000')) {
-            gameOne.tab[0][2] = mark;
-        } else if (playerChoice.equalsIgnoreCase("A2") && (gameOne.tab[1][0] == '\u0000')) {
-            gameOne.tab[1][0] = mark;
-        } else if (playerChoice.equalsIgnoreCase("B2") && (gameOne.tab[1][1] == '\u0000')) {
-            gameOne.tab[1][1] = mark;
-        } else if (playerChoice.equalsIgnoreCase("C2") && (gameOne.tab[1][2] == '\u0000')) {
-            gameOne.tab[1][2] = mark;
-        } else if (playerChoice.equalsIgnoreCase("A3") && (gameOne.tab[2][0] == '\u0000')) {
-            gameOne.tab[2][0] = mark;
-        } else if (playerChoice.equalsIgnoreCase("B3") && (gameOne.tab[2][1] == '\u0000')) {
-            gameOne.tab[2][1] = mark;
-        } else if (playerChoice.equalsIgnoreCase("C3") && (gameOne.tab[2][2] == '\u0000')) {
-            gameOne.tab[2][2] = mark;
-        } else {
+        if (!setMark(playerChoice, mark)) {
+
             System.out.println("To pole jest już zajęte! Spróbuj jeszcze raz.");
             return false;
         }
 
         gameOne.board();
         return true;
+    }
+
+    private boolean setMark(String playerChoice, char mark) {
+        Coordinates coordinates = map.map.get(playerChoice.toUpperCase());
+        if (gameOne.tab[coordinates.x][coordinates.y] == '\u0000') {
+            gameOne.tab[coordinates.x][coordinates.y] = mark;
+            return true;
+        }
+        return false;
+
     }
 }
